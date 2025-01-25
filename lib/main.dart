@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:loader_overlay/loader_overlay.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -20,11 +19,9 @@ class DictionaryApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           fontFamily: 'iranyekan',
         ),
-        home: LoaderOverlay(
-          child: Directionality(
-            textDirection: TextDirection.rtl, // Set the text direction to RTL
-            child: DictionaryHomePage(),
-          ),
+        home: Directionality(
+          textDirection: TextDirection.rtl, // Set the text direction to RTL
+          child: DictionaryHomePage(),
         ));
   }
 }
