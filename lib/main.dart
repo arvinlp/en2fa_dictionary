@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -13,17 +14,18 @@ class DictionaryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'دیکشنری ویرا',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'iranyekan',
-      ),
-      home: Directionality(
-        textDirection: TextDirection.rtl, // Set the text direction to RTL
-        child: DictionaryHomePage(),
-      ),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'دیکشنری ویرا',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          fontFamily: 'iranyekan',
+        ),
+        home: LoaderOverlay(
+          child: Directionality(
+            textDirection: TextDirection.rtl, // Set the text direction to RTL
+            child: DictionaryHomePage(),
+          ),
+        ));
   }
 }
 
@@ -65,23 +67,21 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
 
   Future<void> _searchDictionary() async {
     if (_database == null || _searchWord.isEmpty) return;
-
-    final List<Map<String, dynamic>> exactResults = await _database!.query(
-        'words',
-        where: 'en = ?',
-        whereArgs: [_searchWord],
-        groupBy: 'en');
-
+    if (_definition.isNotEmpty) {
+      _definition.clear();
+    }
+    final List<Map<String, dynamic>> exactResults = await _database!
+        .rawQuery('SELECT * FROM words WHERE en = ${_searchWord} GROUP BY en');
     setState(() {
       if (exactResults.isNotEmpty) {
         if (exactResults.length > 1) {
           _definition =
               exactResults.map((result) => result['fa'] as String).toList();
         } else {
-          _definition = exactResults.first['fa'] ?? 'ترجمه پیدا نشد.';
+          _definition.add(exactResults.first['fa'] ?? 'ترجمه پیدا نشد.');
         }
       } else {
-        _definition = ['ترجمه پیدا نشد'];
+        _definition.add('ترجمه پیدا نشد');
       }
     });
   }
