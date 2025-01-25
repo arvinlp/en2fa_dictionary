@@ -67,18 +67,20 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
     if (_definition.isNotEmpty) {
       _definition.clear();
     }
-    final List<Map<String, dynamic>> exactResults = await _database!
-        .rawQuery('SELECT * FROM words WHERE en = ${_searchWord} GROUP BY en');
+    final List<Map<String, dynamic>> exactResults = await _database!.rawQuery(
+        'SELECT fa,en FROM words WHERE en = ? GROUP BY en', [_searchWord]);
     setState(() {
       if (exactResults.isNotEmpty) {
-        if (exactResults.length > 1) {
-          _definition =
-              exactResults.map((result) => result['fa'] as String).toList();
-        } else {
-          _definition.add(exactResults.first['fa'] ?? 'ترجمه پیدا نشد.');
-        }
+        _definition =
+            exactResults.map((result) => result['fa'] as String).toList();
+        // if (exactResults.length > 0) {
+        //   _definition =
+        //       exactResults.map((result) => result['fa'] as String).toList();
+        // } else {
+        //   _definition.add(exactResults.first['fa'] ?? 'ترجمه پیدا نشد.');
+        // }
       } else {
-        _definition.add('ترجمه پیدا نشد');
+        _definition.add('ترجمه پیدا نشد.');
       }
     });
   }
